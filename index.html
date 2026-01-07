@@ -264,14 +264,14 @@
         
         let board = ["", "", "", "", "", "", "", "", ""];
         let isGameActive = true;
-        let isAiThinking = false; // Turn lock flag
+        let isAiThinking = false; 
         const playerX = "X";
         const playerO = "O";
 
         const aiMessages = [
-            "Hold on… big brain moment.",
-            "Just a second. This one matters.",
-            "Let me cook."
+            "Analyzing your patterns...",
+            "Checking for weaknesses...",
+            "Strategizing..."
         ];
 
         resetBtn.addEventListener('click', (e) => {
@@ -307,13 +307,12 @@
         cells.forEach(cell => {
             cell.addEventListener('click', (e) => {
                 const index = cell.getAttribute('data-index');
-                // Check if spot is empty AND game is active AND it's NOT AI's turn
                 if (board[index] === "" && isGameActive && !isAiThinking) {
                     makeMove(index, playerX);
                     if (isGameActive) {
-                        isAiThinking = true; // Lock user input
+                        isAiThinking = true; 
                         statusText.innerText = aiMessages[Math.floor(Math.random() * aiMessages.length)];
-                        setTimeout(aiMove, 2000);
+                        setTimeout(aiMove, 800);
                     }
                 }
             });
@@ -333,29 +332,31 @@
             }
             
             let moveIndex;
-            const isPerfectMove = Math.random() > 0.5;
+            // "Fair Chance" Logic: 70% probability of a perfect move, 30% probability of a random move.
+            // This makes it challenging but allows for occasional AI blunders.
+            const willPlayPerfectly = Math.random() < 0.70;
 
-            if (isPerfectMove) {
+            if (willPlayPerfectly) {
                 moveIndex = minimax(board, playerO).index;
             } else {
-                const avail = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-                moveIndex = avail[Math.floor(Math.random() * avail.length)];
+                const availSpots = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+                moveIndex = availSpots[Math.floor(Math.random() * availSpots.length)];
             }
 
             makeMove(moveIndex, playerO);
-            isAiThinking = false; // Unlock user input
+            isAiThinking = false; 
             if (isGameActive) statusText.innerText = "Your turn (X)";
         }
 
         function checkResult() {
             if (checkWinner(board, playerX)) {
-                statusText.innerText = "You won! Fair play.";
+                statusText.innerText = "You win! Impressive.";
                 endGame();
             } else if (checkWinner(board, playerO)) {
-                statusText.innerText = "I win. Better luck next time!";
+                statusText.innerText = "I win. Keep practicing!";
                 endGame();
             } else if (!board.includes("")) {
-                statusText.innerText = "A draw. Well played.";
+                statusText.innerText = "A solid draw.";
                 endGame();
             }
         }
@@ -373,6 +374,7 @@
 
         function minimax(newBoard, player) {
             const availSpots = newBoard.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+            
             if (checkWinner(newBoard, playerX)) return { score: -10 };
             if (checkWinner(newBoard, playerO)) return { score: 10 };
             if (availSpots.length === 0) return { score: 0 };
@@ -381,7 +383,15 @@
             for (let i = 0; i < availSpots.length; i++) {
                 const move = { index: availSpots[i] };
                 newBoard[availSpots[i]] = player;
-                move.score = minimax(newBoard, player === playerO ? playerX : playerO).score;
+                
+                if (player === playerO) {
+                    const result = minimax(newBoard, playerX);
+                    move.score = result.score;
+                } else {
+                    const result = minimax(newBoard, playerO);
+                    move.score = result.score;
+                }
+                
                 newBoard[availSpots[i]] = "";
                 moves.push(move);
             }
@@ -389,10 +399,20 @@
             let bestMove;
             if (player === playerO) {
                 let bestScore = -10000;
-                moves.forEach((m, i) => { if (m.score > bestScore) { bestScore = m.score; bestMove = i; } });
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score > bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
             } else {
                 let bestScore = 10000;
-                moves.forEach((m, i) => { if (m.score < bestScore) { bestScore = m.score; bestMove = i; } });
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score < bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
             }
             return moves[bestMove];
         }
