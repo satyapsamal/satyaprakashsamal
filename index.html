@@ -37,6 +37,20 @@
             justify-content: center;
             gap: 15px;
             max-width: 600px;
+            width: 90%;
+        }
+
+        /* Mobile specific: stack buttons vertically */
+        @media (max-width: 640px) {
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .ripple-btn {
+                width: 100%;
+                max-width: 280px;
+                text-align: center;
+            }
         }
 
         .ripple-btn {
@@ -114,7 +128,6 @@
             text-align: center;
             width: 340px;
             position: relative;
-            /* Pop-up effect */
             transform: scale(0.7);
             opacity: 0;
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
@@ -125,7 +138,6 @@
             opacity: 1;
         }
 
-        /* Reset Icon */
         #reset-game {
             position: absolute;
             top: 15px;
@@ -239,15 +251,12 @@
             });
         });
 
-        // --- Challenge Button Logic ---
         const challengeBtn = document.getElementById('challenge-btn');
         challengeBtn.addEventListener('click', (e) => {
             createRipple(e, challengeBtn);
-            // Small delay to let ripple start before modal covers screen
             setTimeout(toggleGame, 250);
         });
 
-        // --- Game Logic ---
         const modal = document.getElementById('game-modal');
         const resetBtn = document.getElementById('reset-game');
         const cells = document.querySelectorAll('.cell');
@@ -255,6 +264,7 @@
         
         let board = ["", "", "", "", "", "", "", "", ""];
         let isGameActive = true;
+        let isAiThinking = false; // Turn lock flag
         const playerX = "X";
         const playerO = "O";
 
@@ -273,22 +283,19 @@
             const isHidden = !modal.classList.contains('open');
             if (isHidden) {
                 modal.style.display = 'flex';
-                // Trigger reflow for transition
                 modal.offsetHeight;
                 modal.classList.add('open');
                 resetGame();
             } else {
                 modal.classList.remove('open');
-                // Wait for transition to finish before hiding
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                }, 300);
+                setTimeout(() => { modal.style.display = 'none'; }, 300);
             }
         }
 
         function resetGame() {
             board = ["", "", "", "", "", "", "", "", ""];
             isGameActive = true;
+            isAiThinking = false;
             resetBtn.style.display = 'none';
             statusText.innerText = `Your turn (X)`;
             cells.forEach(cell => {
@@ -300,9 +307,11 @@
         cells.forEach(cell => {
             cell.addEventListener('click', (e) => {
                 const index = cell.getAttribute('data-index');
-                if (board[index] === "" && isGameActive) {
+                // Check if spot is empty AND game is active AND it's NOT AI's turn
+                if (board[index] === "" && isGameActive && !isAiThinking) {
                     makeMove(index, playerX);
                     if (isGameActive) {
+                        isAiThinking = true; // Lock user input
                         statusText.innerText = aiMessages[Math.floor(Math.random() * aiMessages.length)];
                         setTimeout(aiMove, 2000);
                     }
@@ -318,7 +327,10 @@
         }
 
         function aiMove() {
-            if (!isGameActive) return;
+            if (!isGameActive) {
+                isAiThinking = false;
+                return;
+            }
             
             let moveIndex;
             const isPerfectMove = Math.random() > 0.5;
@@ -331,6 +343,7 @@
             }
 
             makeMove(moveIndex, playerO);
+            isAiThinking = false; // Unlock user input
             if (isGameActive) statusText.innerText = "Your turn (X)";
         }
 
@@ -349,6 +362,7 @@
 
         function endGame() {
             isGameActive = false;
+            isAiThinking = false;
             resetBtn.style.display = 'flex';
         }
 
