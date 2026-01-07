@@ -269,9 +269,12 @@
         const playerO = "O";
 
         const aiMessages = [
-            "Optimizing strategy...",
-            "Win probability: 99.9%...",
-            "Checking all 255,168 variations..."
+            "Let me cook...",
+            "High key judging your move...",
+            "Wait, this move is mid...",
+            "No cap, I'm winning this...",
+            "Bet...",
+            "Slay, but you still losing..."
         ];
 
         resetBtn.addEventListener('click', (e) => {
@@ -312,7 +315,7 @@
                     if (isGameActive) {
                         isAiThinking = true; 
                         statusText.innerText = aiMessages[Math.floor(Math.random() * aiMessages.length)];
-                        setTimeout(aiMove, 600);
+                        setTimeout(aiMove, 1000); // Slight delay to read the message
                     }
                 }
             });
@@ -332,8 +335,6 @@
             }
             
             let moveIndex;
-            // "God Mode": 95% perfect move probability.
-            // 95/100 threshold means the AI will almost never make a mistake.
             const willPlayPerfectly = Math.random() < 0.95;
 
             if (willPlayPerfectly) {
@@ -350,13 +351,13 @@
 
         function checkResult() {
             if (checkWinner(board, playerX)) {
-                statusText.innerText = "Miracle! You won.";
+                statusText.innerText = "Main character energy. You won.";
                 endGame();
             } else if (checkWinner(board, playerO)) {
-                statusText.innerText = "I win. Perfect execution.";
+                statusText.innerText = "L + Ratio. I win.";
                 endGame();
             } else if (!board.includes("")) {
-                statusText.innerText = "Inevitably a draw.";
+                statusText.innerText = "A draw? Respect.";
                 endGame();
             }
         }
