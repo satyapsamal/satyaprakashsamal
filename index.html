@@ -269,9 +269,9 @@
         const playerO = "O";
 
         const aiMessages = [
-            "Analyzing your patterns...",
-            "Checking for weaknesses...",
-            "Strategizing..."
+            "Optimizing strategy...",
+            "Win probability: 99.9%...",
+            "Checking all 255,168 variations..."
         ];
 
         resetBtn.addEventListener('click', (e) => {
@@ -312,7 +312,7 @@
                     if (isGameActive) {
                         isAiThinking = true; 
                         statusText.innerText = aiMessages[Math.floor(Math.random() * aiMessages.length)];
-                        setTimeout(aiMove, 800);
+                        setTimeout(aiMove, 600);
                     }
                 }
             });
@@ -332,9 +332,9 @@
             }
             
             let moveIndex;
-            // "Fair Chance" Logic: 70% probability of a perfect move, 30% probability of a random move.
-            // This makes it challenging but allows for occasional AI blunders.
-            const willPlayPerfectly = Math.random() < 0.70;
+            // "God Mode": 95% perfect move probability.
+            // 95/100 threshold means the AI will almost never make a mistake.
+            const willPlayPerfectly = Math.random() < 0.95;
 
             if (willPlayPerfectly) {
                 moveIndex = minimax(board, playerO).index;
@@ -350,13 +350,13 @@
 
         function checkResult() {
             if (checkWinner(board, playerX)) {
-                statusText.innerText = "You win! Impressive.";
+                statusText.innerText = "Miracle! You won.";
                 endGame();
             } else if (checkWinner(board, playerO)) {
-                statusText.innerText = "I win. Keep practicing!";
+                statusText.innerText = "I win. Perfect execution.";
                 endGame();
             } else if (!board.includes("")) {
-                statusText.innerText = "A solid draw.";
+                statusText.innerText = "Inevitably a draw.";
                 endGame();
             }
         }
