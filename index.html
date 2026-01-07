@@ -21,6 +21,11 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            /* Disable text selection via CSS */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .name-text {
@@ -195,7 +200,7 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div class="name-text">Satya Prakash Samal</div>
 
@@ -232,6 +237,32 @@
     </div>
 
     <script>
+        // --- SECURITY BLOCK START ---
+        // Disable Right Click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Disable Keyboard Shortcuts
+        document.onkeydown = function(e) {
+            // F12 (DevTools)
+            if (e.keyCode == 123) return false;
+            
+            // Ctrl+Shift+I (Inspect)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            
+            // Ctrl+Shift+C (Inspect Element)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            
+            // Ctrl+Shift+J (Console)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            
+            // Ctrl+U (Source Code)
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            
+            // Ctrl+S (Save Page)
+            if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
+        };
+        // --- SECURITY BLOCK END ---
+
         function createRipple(e, element) {
             let rect = element.getBoundingClientRect();
             let x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
